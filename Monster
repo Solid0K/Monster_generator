@@ -1,0 +1,167 @@
+#include <iostream>
+#include <random>
+#include <chrono>
+
+class Monster {
+public:
+    enum Type {
+        dragon,
+        goblin,
+        orge,
+        orc,
+        skeleton,
+        troll,
+        vampire,
+        zombie,
+        maxMonsterTypes,
+    };
+    Monster()=default;
+    Monster(const Type& species,const std::string& name,const std::string& roar,const int& hits_point):
+    m_species{species},m_name{name},m_roar{roar},m_hits_point{hits_point}{}
+
+    constexpr std::string_view getTypeString() const;
+    void print() const;
+private:
+    Type m_species{};
+    std::string m_name{};
+    std::string m_roar{};
+    int m_hits_point{};
+};
+
+constexpr std::string_view Monster::getTypeString() const {
+    switch (m_species) {
+        case dragon: {
+            return "dragon";
+        }
+        case goblin: {
+            return "goblin";
+        }
+        case orge: {
+            return "orge";
+        }
+        case orc: {
+            return "orc";
+        }
+        case skeleton: {
+            return "skeleton";
+        }
+        case troll: {
+            return "troll";
+        }
+        case vampire: {
+            return "vampire";
+        }
+        case zombie: {
+            return "zombie";
+        }
+        case maxMonsterTypes: {
+            return "maxMonsterType";
+        }
+        default: {
+            return "???";
+        }
+    }
+}
+
+void Monster::print() const {
+    if (m_hits_point==0) {
+        std::cout<<m_name<<" the "<<getTypeString()<<" is dead"<<'\n';
+    }else {
+        std::cout<<m_name<<" the "<<getTypeString()<<" has "<<m_hits_point<<" hit points and says "<<m_roar<<'\n';
+    }
+}
+
+namespace MonsterGenerator {
+    std::string getName(const int& choice) {
+        switch(choice) {
+            case 0: {
+                return "John Marston";
+            }
+            case 1: {
+                return "Arthur Morgon";
+            }
+            case 3: {
+                return "Bill Williamson";
+            }
+            case 4: {
+                return "Javier Esculla";
+            }
+            case 5: {
+                return "Dutch Vin der lin";
+            }
+            default: return "???";
+        }
+    }
+    std::string getroar(const int& choice) {
+        switch (choice) {
+            case 0: {
+                return "warara";
+            }
+            case 1: {
+                return "wororor";
+            }
+            case 2: {
+                return "volaola";
+            }
+            case 3: {
+                return "hohohohoho";
+            }
+            case 4: {
+                return "vipovipovipo";
+            }
+            case 5: {
+                return "lolaloaloa";
+            }
+            default: return "???";
+        }
+    }
+    std::optional<Monster::Type> get_type(const int& choice) {
+        switch (choice) {
+            case 0: {
+                return Monster::Type::dragon;
+            }
+            case 1: {
+                return Monster::Type::goblin;
+            }
+            case 2: {
+                return Monster::Type::orge;
+            }
+            case 3: {
+                return Monster::Type::orc;
+            }
+            case 4: {
+                return Monster::Type::skeleton;
+            }
+            case 5: {
+                return Monster::Type::troll;
+            }
+            case 6: {
+                return Monster::Type::vampire;
+            }
+            case 7: {
+                return Monster::Type::zombie;
+            }
+            default: {
+                return {};
+            }
+        }
+    }
+    inline std::mt19937 generate() {
+        std::random_device rd{};
+        std::seed_seq sq{static_cast<std::seed_seq::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()),
+rd(),rd(),rd(),rd(),rd(),rd(),rd()};
+        return std::mt19937{sq};
+    }
+    inline std::mt19937 mt{generate()};
+    Monster get_monster() {
+        return Monster{(get_type(std::uniform_int_distribution<int>{0,7}(mt)).value()),getName(std::uniform_int_distribution<int>{0,5}(mt)),getroar(std::uniform_int_distribution<int>{0,5}(mt)),std::uniform_int_distribution<int>{1,100}(mt)};
+    }
+};
+
+int main()
+{
+    Monster m{ MonsterGenerator::get_monster() };
+    m.print();
+
+    return 0;
+}
